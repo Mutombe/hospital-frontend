@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@layer base {
+    html {
+        font-family: 'Hind Mysuru', sans-serif;
+    }
+    
+    body {
+        font-family: 'Hind Mysuru', sans-serif;
+    }
+  }

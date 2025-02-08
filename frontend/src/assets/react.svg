@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#2563eb"/>
+  
+  <!-- Medical cross (white) -->
+  <rect x="14" y="8" width="4" height="16" fill="white" rx="1"/>
+  <rect x="8" y="14" width="16" height="4" fill="white" rx="1"/>
+  
+  <!-- Curved accent line (gray) -->
+  <path d="M16 4a12 12 0 0 1 0 24" fill="none" stroke="#94a3b8" stroke-width="2"/>
+</svg>
