@@ -1,26 +1,45 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+// features/patients/patientSlice.js
 import axios from 'axios';
 
-const API_URL = 'http://127.0.0.1:8000/api/patients/';
+export const fetchPatients = createAsyncThunk(
+  'patients/fetchPatients',
+  async () => {
+    const response = await api.get('/patients/');
+    return response.data;
+  }
+);
 
-export const fetchPatients = createAsyncThunk('patients/fetchPatients', async () => {
-  const response = await axios.get(API_URL);
-  return response.data;
-});
+export const createMedicalRecord = createAsyncThunk(
+  'patients/createMedicalRecord',
+  async (recordData) => {
+    const response = await api.post('/medical-records/', recordData);
+    return response.data;
+  }
+);
 
-export const addPatient = createAsyncThunk('patients/addPatient', async (patient) => {
-  const response = await axios.post(API_URL, patient);
-  return response.data;
-});
+export const bookAppointment = createAsyncThunk(
+  'patients/bookAppointment',
+  async (appointmentData) => {
+    const response = await api.post('/appointments/', appointmentData);
+    return response.data;
+  }
+);
 
 const patientSlice = createSlice({
-  name: 'patient',
+  name: 'patients',
   initialState: {
     patients: [],
+    medicalRecords: [],
+    appointments: [],
     status: 'idle',
     error: null,
   },
-  reducers: {},
+  reducers: {
+    setNotification: (state, action) => {
+      state.notification = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchPatients.pending, (state) => {
@@ -33,11 +52,9 @@ const patientSlice = createSlice({
       .addCase(fetchPatients.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
-      })
-      .addCase(addPatient.fulfilled, (state, action) => {
-        state.patients.push(action.payload);
       });
   },
 });
 
+export const { setNotification } = patientSlice.actions;
 export default patientSlice.reducer;
