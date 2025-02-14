@@ -1,18 +1,10 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Hospital,
-  Calendar,
   User,
-  Bell,
-  Settings,
-  Search,
-  Menu,
-  X,
-  LogIn,
-  LogOut,
-  UserPlus
+  Stethoscope
 } from 'lucide-react';
 import {
   Dialog,
@@ -23,11 +15,16 @@ import {
   TextField,
   Alert,
   createTheme,
-  ThemeProvider
+  ThemeProvider,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  Typography
 } from '@mui/material';
 import { login, register, logout } from './authSlice';
 
-// Create MUI theme
 const theme = createTheme({
   palette: {
     primary: {
@@ -39,7 +36,6 @@ const theme = createTheme({
   },
 });
 
-// Authentication Modals Component
 const AuthModals = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -47,6 +43,9 @@ const AuthModals = () => {
     username: '',
     password: '',
     email: '',
+    role: '',
+    phone: '',
+    address: ''
   });
 
   const dispatch = useDispatch();
@@ -63,7 +62,7 @@ const AuthModals = () => {
         password: formData.password
       })).unwrap();
       setIsLoginOpen(false);
-      setFormData({ username: '', password: '', email: '' });
+      setFormData({ username: '', password: '', email: '', role: '', phone: '', address: '' });
     } catch (err) {
       console.error('Login failed:', err);
     }
@@ -73,7 +72,7 @@ const AuthModals = () => {
     try {
       await dispatch(register(formData)).unwrap();
       setIsRegisterOpen(false);
-      setFormData({ username: '', password: '', email: '' });
+      setFormData({ username: '', password: '', email: '', role: '', phone: '', address: '' });
     } catch (err) {
       console.error('Registration failed:', err);
     }
@@ -81,6 +80,7 @@ const AuthModals = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      {/* Login Dialog */}
       <Dialog open={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
         <DialogTitle style={{ color: '#1e40af' }}>Login to MediCare Hub</DialogTitle>
         <DialogContent>
@@ -120,6 +120,7 @@ const AuthModals = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Registration Dialog */}
       <Dialog open={isRegisterOpen} onClose={() => setIsRegisterOpen(false)}>
         <DialogTitle style={{ color: '#1e40af' }}>Create an Account</DialogTitle>
         <DialogContent>
@@ -129,6 +130,7 @@ const AuthModals = () => {
             label="Email"
             type="email"
             fullWidth
+            required
             margin="normal"
             value={formData.email}
             onChange={handleInputChange}
@@ -138,21 +140,72 @@ const AuthModals = () => {
             name="username"
             label="Username"
             fullWidth
+            required
             margin="normal"
             value={formData.username}
             onChange={handleInputChange}
             InputLabelProps={{ style: { color: '#1e40af' } }}
           />
+          
           <TextField
             name="password"
             label="Password"
             type="password"
             fullWidth
+            required
             margin="normal"
             value={formData.password}
             onChange={handleInputChange}
             InputLabelProps={{ style: { color: '#1e40af' } }}
           />
+          <FormControl fullWidth margin="normal" required>
+            <InputLabel id="role-label" style={{ color: '#1e40af' }}>Select Your Primary Role</InputLabel>
+            <Select
+              labelId="role-label"
+              name="role"
+              value={formData.role}
+              onChange={handleInputChange}
+              label="Select Your Primary Role"
+            >
+              <MenuItem value="PATIENT">
+                <Box display="flex" alignItems="center">
+                  <User className="w-5 h-5 mr-2" />
+                  Patient
+                </Box>
+              </MenuItem>
+              <MenuItem value="DOCTOR">
+                <Box display="flex" alignItems="center">
+                  <Stethoscope className="w-5 h-5 mr-2" />
+                  Healthcare Provider
+                </Box>
+              </MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            name="phone"
+            label="Phone"
+            fullWidth
+            required
+            margin="normal"
+            value={formData.phone}
+            onChange={handleInputChange}
+            InputLabelProps={{ style: { color: '#1e40af' } }}
+          />
+          <TextField
+            name="address"
+            label="Address"
+            fullWidth
+            required
+            margin="normal"
+            value={formData.address}
+            onChange={handleInputChange}
+            InputLabelProps={{ style: { color: '#1e40af' } }}
+            multiline
+            rows={2}
+          />
+          <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
+            Note: You can add additional roles later through your profile settings.
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsRegisterOpen(false)} color="secondary">
