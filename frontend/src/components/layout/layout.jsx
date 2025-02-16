@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -33,214 +33,9 @@ import {
   Typography,
 } from "@mui/material";
 import { login, register, logout } from "../../redux/slices/authSlice";
+import { clearError, setError } from "../../redux/slices/authSlice";
+import { initializeAuth } from '../../redux/slices/authSlice';
 
-// Authentication Modals Component
-const AuthModals = () => {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    email: "",
-    role: "",
-    phone: "",
-    address: "",
-  });
-
-  const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.auth);
-
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleLogin = async () => {
-    try {
-      await dispatch(
-        login({
-          username: formData.username,
-          password: formData.password,
-        })
-      ).unwrap();
-      setIsLoginOpen(false);
-      setFormData({ username: "", password: "", email: "" });
-    } catch (err) {
-      console.error("Login failed:", err);
-    }
-  };
-
-  const handleRegister = async () => {
-    try {
-      await dispatch(register(formData)).unwrap();
-      setIsRegisterOpen(false);
-      setFormData({
-        username: "",
-        password: "",
-        email: "",
-        role: "",
-        phone: "",
-        address: "",
-      });
-    } catch (err) {
-      console.error("Registration failed:", err);
-    }
-  };
-
-  return (
-    <ThemeProvider theme={theme}>
-      <Dialog open={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
-        <DialogTitle style={{ color: "#1e40af" }}>
-          Login to MediCare Hub
-        </DialogTitle>
-        <DialogContent>
-          {error && (
-            <Alert severity="error" className="mb-4">
-              {error}
-            </Alert>
-          )}
-          <TextField
-            name="username"
-            label="Username"
-            fullWidth
-            margin="normal"
-            value={formData.username}
-            onChange={handleInputChange}
-            InputLabelProps={{ style: { color: "#1e40af" } }}
-          />
-          <TextField
-            name="password"
-            label="Password"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={formData.password}
-            onChange={handleInputChange}
-            InputLabelProps={{ style: { color: "#1e40af" } }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsLoginOpen(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleLogin}
-            color="primary"
-            disabled={loading}
-            style={{ backgroundColor: "#3b82f6", color: "white" }}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={isRegisterOpen} onClose={() => setIsRegisterOpen(false)}>
-        <DialogTitle style={{ color: "#1e40af" }}>
-          Create an Account
-        </DialogTitle>
-        <DialogContent>
-          {error && (
-            <Alert severity="error" className="mb-4">
-              {error}
-            </Alert>
-          )}
-          <TextField
-            name="email"
-            label="Email"
-            type="email"
-            fullWidth
-            margin="normal"
-            value={formData.email}
-            onChange={handleInputChange}
-            InputLabelProps={{ style: { color: "#1e40af" } }}
-          />
-          <TextField
-            name="username"
-            label="Username"
-            fullWidth
-            margin="normal"
-            value={formData.username}
-            onChange={handleInputChange}
-            InputLabelProps={{ style: { color: "#1e40af" } }}
-          />
-          <TextField
-            name="password"
-            label="Password"
-            type="password"
-            fullWidth
-            margin="normal"
-            value={formData.password}
-            onChange={handleInputChange}
-            InputLabelProps={{ style: { color: "#1e40af" } }}
-          />
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel id="role-label" style={{ color: "#1e40af" }}>
-              Select Your Primary Role
-            </InputLabel>
-            <Select
-              labelId="role-label"
-              name="role"
-              value={formData.role}
-              onChange={handleInputChange}
-              label="Select Your Primary Role"
-            >
-              <MenuItem value="PATIENT">
-                <Box display="flex" alignItems="center">
-                  <User className="w-5 h-5 mr-2" />
-                  Patient
-                </Box>
-              </MenuItem>
-              <MenuItem value="DOCTOR">
-                <Box display="flex" alignItems="center">
-                  <Stethoscope className="w-5 h-5 mr-2" />
-                  Healthcare Provider
-                </Box>
-              </MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            name="phone"
-            label="Phone"
-            fullWidth
-            required
-            margin="normal"
-            value={formData.phone}
-            onChange={handleInputChange}
-            InputLabelProps={{ style: { color: "#1e40af" } }}
-          />
-          <TextField
-            name="address"
-            label="Address"
-            fullWidth
-            required
-            margin="normal"
-            value={formData.address}
-            onChange={handleInputChange}
-            InputLabelProps={{ style: { color: "#1e40af" } }}
-            multiline
-            rows={2}
-          />
-          <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-            Note: You can add additional roles later through your profile
-            settings.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsRegisterOpen(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleRegister}
-            color="primary"
-            disabled={loading}
-            style={{ backgroundColor: "#3b82f6", color: "white" }}
-          >
-            {loading ? "Creating account..." : "Register"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </ThemeProvider>
-  );
-};
 
 // Create MUI theme
 const theme = createTheme({
@@ -262,9 +57,16 @@ const Layout = ({ children }) => {
   const dispatch = useDispatch();
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
 
+  useEffect(() => {
+    dispatch(initializeAuth());
+  }, [dispatch]);
+
+
   const handleLogout = async () => {
     try {
       await dispatch(logout()).unwrap();
+      // Optionally reload the page or redirect
+      window.location.reload();
     } catch (err) {
       console.error("Logout failed:", err);
     }
@@ -322,16 +124,27 @@ const Layout = ({ children }) => {
 
     const handleLogin = async () => {
       try {
+        // Clear previous errors
+        dispatch(clearError());
+        
+        // Validate fields
+        if (!formData.username || !formData.password) {
+          throw new Error('Please fill in all fields');
+        }
+    
         await dispatch(
           login({
-            username: formData.username,
+            username: formData.username.trim(),
             password: formData.password,
           })
         ).unwrap();
+        
         setIsLoginOpen(false);
-        setFormData({ username: "", password: "", email: "" });
+        setFormData({ username: "", password: "" });
+        
       } catch (err) {
-        console.error("Login failed:", err);
+        const errorMessage = err.payload?.detail?.[0] || err.message;
+        dispatch(setError(errorMessage));
       }
     };
 
