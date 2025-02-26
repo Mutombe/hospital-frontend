@@ -35,7 +35,7 @@ import {
 import { login, register, logout } from "../../redux/slices/authSlice";
 import { clearError, setError } from "../../redux/slices/authSlice";
 import { initializeAuth } from '../../redux/slices/authSlice';
-
+import { useNavigate } from "react-router-dom";
 
 // Create MUI theme
 const theme = createTheme({
@@ -55,6 +55,7 @@ const Layout = ({ children }) => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const dispatch = useDispatch();
+  
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -115,6 +116,9 @@ const Layout = ({ children }) => {
       phone: "",
       address: "",
     });
+    const [step, setStep] = useState(1);
+    const navigate = useNavigate();
+
 
     const { loading, error } = useSelector((state) => state.auth);
 
@@ -150,18 +154,17 @@ const Layout = ({ children }) => {
 
     const handleRegister = async () => {
       try {
+        dispatch(clearError());
+        if (!formData.email || !formData.password || !formData.role) {
+          throw new Error('Please fill in all required fields');
+        }
+        
         await dispatch(register(formData)).unwrap();
         setIsRegisterOpen(false);
-        setFormData({
-          username: "",
-          password: "",
-          email: "",
-          role: "",
-          phone: "",
-          address: "",
-        });
+        navigate('/check-email');
+        setFormData(initialFormState);
       } catch (err) {
-        console.error("Registration failed:", err);
+        dispatch(setError(err.payload?.detail || 'Registration failed'));
       }
     };
 
@@ -211,8 +214,11 @@ const Layout = ({ children }) => {
             </Button>
           </DialogActions>
         </Dialog>
-
+        
+        
         <Dialog open={isRegisterOpen} onClose={() => setIsRegisterOpen(false)}>
+          {step === 1 ? (
+            <>
           <DialogTitle style={{ color: "#1e40af" }}>
             Create an Account
           </DialogTitle>
@@ -276,28 +282,6 @@ const Layout = ({ children }) => {
                 </MenuItem>
               </Select>
             </FormControl>
-            <TextField
-              name="phone"
-              label="Phone"
-              fullWidth
-              required
-              margin="normal"
-              value={formData.phone}
-              onChange={handleInputChange}
-              InputLabelProps={{ style: { color: "#1e40af" } }}
-            />
-            <TextField
-              name="address"
-              label="Address"
-              fullWidth
-              required
-              margin="normal"
-              value={formData.address}
-              onChange={handleInputChange}
-              InputLabelProps={{ style: { color: "#1e40af" } }}
-              multiline
-              rows={2}
-            />
             <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
               Note: You can add additional roles later through your profile
               settings.
@@ -315,7 +299,13 @@ const Layout = ({ children }) => {
             >
               {loading ? "Creating account..." : "Register"}
             </Button>
-          </DialogActions>
+          </DialogActions></>
+          ) : (
+            <div>
+            <h3>Check your email to verify</h3>
+            <Button onClick={() => setIsRegisterOpen(false)}>Close</Button>
+          </div>
+        )}
         </Dialog>
       </ThemeProvider>
     );
