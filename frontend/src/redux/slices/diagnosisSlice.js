@@ -19,6 +19,14 @@ export const createDiagnosis = createAsyncThunk(
   }
 );
 
+export const fetchDiagnoses = createAsyncThunk(
+  'diagnosis/fetchDiagnoses',
+  async () => {
+    const response = await api.get('/diagnoses/');
+    return response.data;
+  }
+);
+
 const diagnosisSlice = createSlice({
   name: 'diagnosis',
   initialState: {

@@ -18,6 +18,14 @@ export const prescribeMedication = createAsyncThunk(
   }
 );
 
+export const fetchMedications = createAsyncThunk(
+  'medication/fetchMedications',
+  async () => {
+    const response = await api.get('/medications/');
+    return response.data;
+  }
+);
+
 const medicationSlice = createSlice({
   name: 'medication',
   initialState: {
@@ -40,6 +48,9 @@ const medicationSlice = createSlice({
       .addCase(prescribeMedication.fulfilled, (state, action) => {
         state.medications.push(action.payload);
         state.activePrescriptions.push(action.payload);
+      })
+      .addCase(fetchMedications.fulfilled, (state, action) => {
+        state.medications = action.payload;
       });
   },
 });

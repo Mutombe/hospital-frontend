@@ -11,6 +11,9 @@ import HomePage from "./components/home/home";
 import VerifyEmailPage from "./components/auth/verify_email";
 import { CheckEmailPage } from "./components/auth/verify_email";
 import { VerifyEmailHandler } from "./components/auth/verify_email";
+import PatientDashboard from "./components/dashboard/patientDashboard";
+import DoctorDashboard from "./components/dashboard/doctorsDashboard";
+import ProfilePage from "./components/auth/profile";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -36,7 +39,9 @@ function App() {
               element={<VerifyEmailHandler />}
             />
             {/* Add more routes here as we create them */}
-            {/* <Route path="/profile" element={<ProfilePage />} /> */}
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/patient-dashboard" element={<PatientDashboard />} />
+            <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
             {/* <Route path="/admin" element={<AdminPage />} /> */}
           </Routes>
         </Layout>

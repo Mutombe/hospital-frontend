@@ -26,6 +26,14 @@ export const bookAppointment = createAsyncThunk(
   }
 );
 
+export const fetchAppointments = createAsyncThunk(
+  'patients/fetchAppointment',
+  async () => {
+    const response = await api.get('/appointments/');
+    return response.data;
+  }
+);
+
 const patientSlice = createSlice({
   name: 'patients',
   initialState: {
@@ -52,7 +60,23 @@ const patientSlice = createSlice({
       .addCase(fetchPatients.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message;
-      });
+      })
+    .addCase(createMedicalRecord.fulfilled, (state, action) => {
+      state.medicalRecords.push(action.payload);
+    })
+    .addCase(bookAppointment.fulfilled, (state, action) => {
+      state.appointments.push(action.payload);
+    })
+    .addCase(fetchAppointments.pending, (state) => {
+      state.status = 'loading';
+    })
+    .addCase(fetchAppointments.fulfilled, (state, action) => {
+      state.appointments.push(action.payload);
+    })
+    .addCase(fetchAppointments.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action.error.message;
+    }); 
   },
 });
 

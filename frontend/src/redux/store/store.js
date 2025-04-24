@@ -6,6 +6,7 @@ import medicalRecordsReducer from '../slices/medicalrecordsSlice';
 import vitalSignsReducer from '../slices/vitalsignsSlice';
 import diagnosisReducer from '../slices/diagnosisSlice';
 import medicationReducer from '../slices/medicationSlice';
+import profileReducer from '../slices/profileSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,6 @@ export const store = configureStore({
     vitalSigns: vitalSignsReducer,
     diagnosis: diagnosisReducer,
     medication: medicationReducer,
-    auth: authReducer,
+    profile: profileReducer
   },
 });

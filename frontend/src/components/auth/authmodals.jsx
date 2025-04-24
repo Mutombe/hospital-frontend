@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import {
   Hospital,
   User,
-  Stethoscope
+  Stethoscope,
+  BriefcaseMedical
 } from 'lucide-react';
 import {
   Dialog,
@@ -242,6 +243,8 @@ const Layout = ({ children }) => {
 
   const navItems = [
     { icon: <Hospital className="w-5 h-5" />, label: "Dashboard", href: "/" },
+    { icon: <Hospital className="w-5 h-5" />, label: "Patient Dashboard", href: "/patient-dashboard" },
+    { icon: <BriefcaseMedical className="w-5 h-5" />, label: "Doctor's Dashboard", href: "/doctors-dashboard" },
     {
       icon: <Calendar className="w-5 h-5" />,
       label: "Appointments",
