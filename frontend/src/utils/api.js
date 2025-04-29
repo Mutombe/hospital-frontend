@@ -1,29 +1,45 @@
 import axios from "axios";
 
-axios.defaults.xsrfCookieName = "csrftoken";
-axios.defaults.xsrfHeaderName = "X-CSRFToken";
-axios.defaults.withCredentials = true;
-
-//const isDevelopment = import.meta.env.MODE === "development";
-//const baseURL = isDevelopment ? import.meta.env.VITE_API_BASE_URL_LOCAL : import.meta.env.VITE_API_BASE_URL_DEPLOY;
+// Centralized token refresh function
+export const refreshTokens = async (refresh) => {
+  try {
+    const { data } = await axios.post(
+      "http://127.0.0.1:8000/core/auth/refresh/", 
+      { refresh },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+    return {
+      access: data.access,
+      refresh: data.refresh || refresh 
+    };
+  } catch (error) {
+    console.error("Token Refresh Error:", error);
+    throw error;
+  }
+};
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
-  withCredentials: true,
+  baseURL:  'https://hospital-pf5g.onrender.com/api/',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  xsrfCookieName: "csrftoken",
+xsrfHeaderName: "X-CSRFToken",
 });
 
-// Add request interceptor
-api.interceptors.request.use(
-  (config) => {
-    const tokens = JSON.parse(localStorage.getItem('tokens'));
-    if (tokens?.access) {
-      config.headers.Authorization = `Bearer ${tokens.access}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+// Add request interceptor for auth token
+api.interceptors.request.use(config => {
+  const token = JSON.parse(localStorage.getItem('auth'))?.access;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
+
 
 export default api;
