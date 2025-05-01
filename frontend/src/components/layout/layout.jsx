@@ -34,8 +34,6 @@ import {
   Typography,
 } from "@mui/material";
 import { login, register, logout } from "../../redux/slices/authSlice";
-import { clearError, setError } from "../../redux/slices/authSlice";
-import { initializeAuth } from '../../redux/slices/authSlice';
 import { useNavigate } from "react-router-dom";
 
 // Create MUI theme
@@ -55,13 +53,10 @@ const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [error, setError] = useState(null);
   const dispatch = useDispatch();
   
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    dispatch(initializeAuth());
-  }, [dispatch]);
 
 
   const handleLogout = async () => {
@@ -81,7 +76,7 @@ const Layout = ({ children }) => {
     {
       icon: <Calendar className="w-5 h-5" />,
       label: "Appointments",
-      href: "/appointments",
+      href: "/doctor-appointment",
     },
     { icon: <User className="w-5 h-5" />, label: "Profile", href: "/profile" },
     {
@@ -123,7 +118,7 @@ const Layout = ({ children }) => {
     const navigate = useNavigate();
 
 
-    const { loading, error } = useSelector((state) => state.auth);
+    const { loading } = useSelector((state) => state.auth);
 
     const handleInputChange = (e) => {
       setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -132,7 +127,7 @@ const Layout = ({ children }) => {
     const handleLogin = async () => {
       try {
         // Clear previous errors
-        dispatch(clearError());
+        setError(null);
         
         // Validate fields
         if (!formData.username || !formData.password) {
@@ -151,13 +146,14 @@ const Layout = ({ children }) => {
         
       } catch (err) {
         const errorMessage = err.payload?.detail?.[0] || err.message;
-        dispatch(setError(errorMessage));
+        setError(errorMessage);
+        //dispatch(setError(errorMessage));
       }
     };
 
     const handleRegister = async () => {
       try {
-        dispatch(clearError());
+        //dispatch(clearError());
         if (!formData.email || !formData.password || !formData.role) {
           throw new Error('Please fill in all required fields');
         }
@@ -165,7 +161,10 @@ const Layout = ({ children }) => {
         await dispatch(register(formData)).unwrap();
         setIsRegisterOpen(false);
         navigate('/check-email');
-        setFormData(initialFormState);
+        setFormData({
+          username: "",
+          password: "",
+          email: "",});
       } catch (err) {
         dispatch(setError(err.payload?.detail || 'Registration failed'));
       }

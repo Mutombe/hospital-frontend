@@ -11,6 +11,7 @@ import HomePage from "./components/home/home";
 import VerifyEmailPage from "./components/auth/verify_email";
 import { CheckEmailPage } from "./components/auth/verify_email";
 import { VerifyEmailHandler } from "./components/auth/verify_email";
+import DoctorAppointmentBooking from "./components/dashboard/appointment";
 import PatientDashboard from "./components/dashboard/patientDashboard";
 import DoctorDashboard from "./components/dashboard/doctorsDashboard";
 import ProfilePage from "./components/auth/profile";
@@ -41,6 +42,7 @@ function App() {
             {/* Add more routes here as we create them */}
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/patient-dashboard" element={<PatientDashboard />} />
+            <Route path="/doctor-appointment" element={<DoctorAppointmentBooking />} />
             <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
             {/* <Route path="/admin" element={<AdminPage />} /> */}
           </Routes>

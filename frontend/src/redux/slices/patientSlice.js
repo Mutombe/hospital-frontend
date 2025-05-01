@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 // features/patients/patientSlice.js
+import api from '../../utils/api';
 import axios from 'axios';
 
 export const fetchPatients = createAsyncThunk(

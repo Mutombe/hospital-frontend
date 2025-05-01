@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { fetchAppointments } from '../../redux/slices/patientSlice';
 import { fetchVitalHistory } from '../../redux/slices/vitalsignsSlice';
 import { fetchMedicalRecords } from '../../redux/slices/medicalrecordsSlice';
@@ -27,6 +28,7 @@ import { fetchMedications } from '../../redux/slices/medicationSlice';
 const PatientDashboard = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const { 
     appointments,   
     loading,
@@ -263,7 +265,7 @@ const PatientDashboard = () => {
             <div className="flex flex-col items-center justify-center py-8 text-center text-gray-500">
               <Calendar className="w-12 h-12 mb-2 opacity-50" />
               <p>No upcoming appointments</p>
-              <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center">
+              <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center" onClick={() => navigate('/doctor-appointment')}>
                 <Plus className="w-4 h-4 mr-1" />
                 Schedule Appointment
               </button>
