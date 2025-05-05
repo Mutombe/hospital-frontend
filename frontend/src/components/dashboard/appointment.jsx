@@ -215,7 +215,7 @@ const DoctorAppointmentBooking = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <h4 className="font-medium text-gray-800">
-                    Dr. {doctor.user?.first_name} {doctor.user?.last_name}
+                    Dr. {doctor.user?.id} {doctor.user?.username}
                   </h4>
                   {doctor.specialty && (
                     <p className="text-sm text-gray-600">{doctor.specialty.name}</p>

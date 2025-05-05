@@ -105,7 +105,7 @@ const Layout = ({ children }) => {
   ];
 
   // Authentication Modal Content
-  const AuthModals = () => {
+const AuthModals = () => {
     const [formData, setFormData] = useState({
       username: "",
       password: "",
@@ -342,9 +342,11 @@ const Layout = ({ children }) => {
           >
             <div className="flex flex-col h-full">
               <div className="h-16 flex items-center justify-center md:justify-start px-4">
+                <a href="/" className="">
                 <span className="font-semibold text-lg hidden md:block ml-2">
                   MediCare Hub
                 </span>
+                </a>
               </div>
               <div className="flex-1 py-6 space-y-1">
                 {isAuthenticated
@@ -484,17 +486,17 @@ const Layout = ({ children }) => {
                 <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
                 <ul className="space-y-2 text-gray-600 text-sm">
                   <li>
-                    <a href="/about" className="hover:text-blue-600">
+                    <a href="/" className="hover:text-blue-600">
                       About Us
                     </a>
                   </li>
                   <li>
-                    <a href="/services" className="hover:text-blue-600">
+                    <a href="/" className="hover:text-blue-600">
                       Services
                     </a>
                   </li>
                   <li>
-                    <a href="/contact" className="hover:text-blue-600">
+                    <a href="/" className="hover:text-blue-600">
                       Contact
                     </a>
                   </li>

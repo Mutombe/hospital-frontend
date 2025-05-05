@@ -7,6 +7,7 @@ import {
   Shield,
   ArrowRight
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
   const features = [
@@ -32,6 +33,9 @@ const HomePage = () => {
     }
   ];
 
+  const { isAuthenticated } = JSON.parse(localStorage.getItem('auth')) || { isAuthenticated: false };
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-16">
       {/* Hero Section */}
@@ -48,13 +52,25 @@ const HomePage = () => {
           Experience healthcare management reimagined. Book appointments, access records, and connect with healthcare providers seamlessly.
         </p>
         <div className="flex justify-center space-x-4">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"
-          >
-            Get Started
-          </motion.button>
+          {isAuthenticated ? (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/patient-dashboard')}
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"
+            >
+              Go to Dashboard
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/register')}
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium"
+            >
+              Get Started
+            </motion.button>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
