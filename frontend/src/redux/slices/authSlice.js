@@ -1,21 +1,25 @@
 // src/features/auth/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAction } from "@reduxjs/toolkit";
 import api from "../../utils/api";
 
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
     try {
-      console.log("Login Credentials:", credentials);
       const response = await api.post("login/", credentials);
-      console.log("Login Response:", response.data);
       return {
         access: response.data.access,
         refresh: response.data.refresh,
-        user: response.data.user,
+        user: {
+          id: response.data.user_id,
+          username: response.data.username,
+          email: response.data.email,
+          role: response.data.role,
+          profile_complete: response.data.profile_complete,
+        },
       };
     } catch (err) {
-      console.error("Login Error:", err.response?.data || err.message);
       return rejectWithValue(
         err.response?.data || { detail: err.message || "Login Failed" }
       );
@@ -70,6 +74,24 @@ const authSlice = createSlice({
       state.tokens = null;
       state.isAuthenticated = false;
     },
+    updateUser: (state, action) => {
+      state.user = {
+        ...state.user,
+        ...action.payload,
+      };
+    },
+    updateProfileCompleteness: (state, action) => {
+      if (state.user) {
+        state.user.profile_complete = action.payload;
+
+        // Update localStorage
+        const authData = JSON.parse(localStorage.getItem("auth"));
+        if (authData) {
+          authData.user.profile_complete = action.payload;
+          localStorage.setItem("auth", JSON.stringify(authData));
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -96,10 +118,14 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.loading = false;
-        state.tokens = action.payload;
+        state.tokens = {
+          access: action.payload.access,
+          refresh: action.payload.refresh,
+        };
         state.user = action.payload.user;
-        console.log("User", state.user);
         state.isAuthenticated = true;
+
+        // Store in localStorage
         localStorage.setItem(
           "auth",
           JSON.stringify({
@@ -123,5 +149,8 @@ const authSlice = createSlice({
 });
 
 export const { logout } = authSlice.actions;
+export const { updateUser } = authSlice.actions;
+export const updateProfileCompleteness = createAction(
+  "auth/updateProfileCompleteness"
+);
 export default authSlice.reducer;
-

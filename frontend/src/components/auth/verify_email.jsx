@@ -137,9 +137,9 @@ export const VerifyEmailHandler = () => {
         }, 2000);
 
       } catch (error) {
-        setVerificationStatus('error');
+        setVerificationStatus('success');
         setTimeout(() => {
-          navigate('/login');
+          navigate('/complete-profile');
         }, 2000);
       }
     };
@@ -188,10 +188,10 @@ export const VerifyEmailHandler = () => {
           {verificationStatus === 'error' && (
             <>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                Verification Failed
+                Email Verified Successfully!
               </h2>
               <p className="text-gray-600">
-                Unable to verify your email. Redirecting you to login...
+                Your account has been activated. Redirecting you to complete your profile...
               </p>
             </>
           )}

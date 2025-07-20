@@ -1,6 +1,6 @@
 // features/profile/profileSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import authSlice from './authSlice';
 import api from '../../utils/api';
 
 export const fetchProfile = createAsyncThunk(
@@ -17,7 +17,7 @@ export const fetchProfile = createAsyncThunk(
 
 export const updateProfile = createAsyncThunk(
   'profile/updateProfile',
-  async (profileData, { rejectWithValue }) => {
+  async (profileData, { dispatch, getState, rejectWithValue }) => {
     try {
       const formData = new FormData();
       
@@ -27,7 +27,8 @@ export const updateProfile = createAsyncThunk(
           if (value instanceof File) {
             formData.append(key, value);
           }
-        } else if (typeof value === 'object') {
+        } else if (key === 'patient' || key === 'doctor') {
+          // Handle nested objects
           Object.entries(value).forEach(([subKey, subValue]) => {
             formData.append(`${key}.${subKey}`, subValue);
           });
@@ -36,11 +37,25 @@ export const updateProfile = createAsyncThunk(
         }
       });
 
+      dispatch(authSlice.actions.updateProfileCompleteness(
+        response.data.profile_complete
+      ));
+
       const response = await api.put('/profile/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+      
+      // Update auth state with new profile_complete status
+      const { auth } = getState();
+      if (auth.user && response.data.user) {
+        dispatch(authSlice.actions.updateUser({
+          ...auth.user,
+          profile_complete: response.data.user.profile_complete
+        }));
+      }
+      
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

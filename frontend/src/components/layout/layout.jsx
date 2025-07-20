@@ -39,7 +39,9 @@ import {
   Typography,
 } from "@mui/material";
 import { login, register, logout } from "../../redux/slices/authSlice";
+import { closeAuthModal,setAuthModalMode, openAuthModal } from "../../redux/slices/authModal";
 import { useNavigate } from "react-router-dom";
+
 
 // Create MUI theme
 const theme = createTheme({
@@ -61,9 +63,13 @@ const Layout = ({ children }) => {
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+
+  const navigate = useNavigate();
+  const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  const modalState = useSelector(state => state.modal);
 
   // Handle mobile detection
   useEffect(() => {
@@ -147,19 +153,13 @@ const Layout = ({ children }) => {
     {
       icon: <LogIn className="w-5 h-5" />,
       label: "Login",
-      onClick: () => {
-        setIsLoginOpen(true);
-        setIsSidebarOpen(false);
-      },
+      onClick: () => dispatch(openAuthModal({ mode: 'login' })),
       mobileLabel: "Login"
     },
     {
       icon: <UserPlus className="w-5 h-5" />,
       label: "Register",
-      onClick: () => {
-        setIsRegisterOpen(true);
-        setIsSidebarOpen(false);
-      },
+       onClick: () => dispatch(openAuthModal({ mode: 'register' })),
       mobileLabel: "Sign Up"
     },
   ];
@@ -256,8 +256,8 @@ const Layout = ({ children }) => {
     return (
       <ThemeProvider theme={theme}>
         <Dialog 
-          open={isLoginOpen} 
-          onClose={() => setIsLoginOpen(false)}
+          open={modalState.authModal.open && modalState.authModal.mode === 'login'}
+          onClose={() => dispatch(closeAuthModal())}
           fullScreen={isMobile}
           maxWidth="sm"
           fullWidth
@@ -309,7 +309,7 @@ const Layout = ({ children }) => {
           </DialogContent>
           <DialogActions style={{ padding: isMobile ? '16px' : '24px' }}>
             {!isMobile && (
-              <Button onClick={() => setIsLoginOpen(false)} color="secondary">
+              <Button onClick={() => dispatch(closeAuthModal())} color="secondary">
                 Cancel
               </Button>
             )}
@@ -331,8 +331,8 @@ const Layout = ({ children }) => {
         </Dialog>
         
         <Dialog 
-          open={isRegisterOpen} 
-          onClose={() => setIsRegisterOpen(false)}
+          open={modalState.authModal.open && modalState.authModal.mode === 'register'}
+          onClose={() => dispatch(closeAuthModal())}
           fullScreen={isMobile}
           maxWidth="sm"
           fullWidth
@@ -346,7 +346,7 @@ const Layout = ({ children }) => {
           >
             {isMobile && (
               <button
-                onClick={() => setIsRegisterOpen(false)}
+                onClick={() => dispatch(closeAuthModal())}
                 className="absolute top-4 right-4 p-2"
               >
                 <X className="w-5 h-5" />
@@ -423,7 +423,7 @@ const Layout = ({ children }) => {
           </DialogContent>
           <DialogActions style={{ padding: isMobile ? '16px' : '24px' }}>
             {!isMobile && (
-              <Button onClick={() => setIsRegisterOpen(false)} color="secondary">
+              <Button onClick={() => dispatch(closeAuthModal())} color="secondary">
                 Cancel
               </Button>
             )}
@@ -685,7 +685,7 @@ const Layout = ({ children }) => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsRegisterOpen(true)}
+                    onClick={() => dispatch(openAuthModal({ mode: 'register' }))}
                     className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     <UserPlus className="w-5 h-5 mr-2" />

@@ -8,13 +8,14 @@ import {
 } from "react-router-dom";
 import Layout from "./components/layout/layout";
 import HomePage from "./components/home/home";
-import VerifyEmailPage from "./components/auth/verify_email";
 import { CheckEmailPage } from "./components/auth/verify_email";
 import { VerifyEmailHandler } from "./components/auth/verify_email";
 import DoctorAppointmentBooking from "./components/dashboard/appointment";
 import PatientDashboard from "./components/dashboard/patientDashboard";
 import DoctorDashboard from "./components/dashboard/doctorsDashboard";
+import RequireAuth from "./utils/requireAuth";
 import ProfilePage from "./components/auth/profile";
+import About from "./components/about/about";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -34,15 +35,33 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<About />} />
             <Route path="/check-email" element={<CheckEmailPage />} />
             <Route
               path="/verify-email/:uidb64/:token"
               element={<VerifyEmailHandler />}
             />
-            {/* Add more routes here as we create them */}
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/patient-dashboard" element={<PatientDashboard />} />
-            <Route path="/doctor-appointment" element={<DoctorAppointmentBooking />} />
+            <Route
+              path="/profile"
+              element={
+                <RequireAuth>
+                  <ProfilePage />
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="/patient-dashboard"
+              element={
+                <RequireAuth requireCompleteProfile>
+                  <PatientDashboard />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/doctor-appointment"
+              element={<DoctorAppointmentBooking />}
+            />
             <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
             {/* <Route path="/admin" element={<AdminPage />} /> */}
           </Routes>
