@@ -39,9 +39,12 @@ import {
   Typography,
 } from "@mui/material";
 import { login, register, logout } from "../../redux/slices/authSlice";
-import { closeAuthModal,setAuthModalMode, openAuthModal } from "../../redux/slices/authModal";
+import {
+  closeAuthModal,
+  setAuthModalMode,
+  openAuthModal,
+} from "../../redux/slices/authModal";
 import { useNavigate } from "react-router-dom";
-
 
 // Create MUI theme
 const theme = createTheme({
@@ -67,31 +70,31 @@ const Layout = ({ children }) => {
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  
+
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
-  const modalState = useSelector(state => state.modal);
+  const modalState = useSelector((state) => state.modal);
 
   // Handle mobile detection
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isMobile && isSidebarOpen && !event.target.closest('.sidebar')) {
+      if (isMobile && isSidebarOpen && !event.target.closest(".sidebar")) {
         setIsSidebarOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isMobile, isSidebarOpen]);
 
   const handleLogout = async () => {
@@ -105,47 +108,47 @@ const Layout = ({ children }) => {
   };
 
   const navItems = [
-    { 
-      icon: <Home className="w-5 h-5" />, 
-      label: "Dashboard", 
+    {
+      icon: <Home className="w-5 h-5" />,
+      label: "Dashboard",
       href: "/",
-      mobileLabel: "Home"
+      mobileLabel: "Home",
     },
-    { 
-      icon: <Hospital className="w-5 h-5" />, 
-      label: "Patient Dashboard", 
+    {
+      icon: <Hospital className="w-5 h-5" />,
+      label: "Patient Dashboard",
       href: "/patient-dashboard",
-      mobileLabel: "Patient"
+      mobileLabel: "Patient",
     },
-    { 
-      icon: <BriefcaseMedical className="w-5 h-5" />, 
-      label: "Doctor's Dashboard", 
+    {
+      icon: <BriefcaseMedical className="w-5 h-5" />,
+      label: "Doctor's Dashboard",
       href: "/doctor-dashboard",
-      mobileLabel: "Doctor"
+      mobileLabel: "Doctor",
     },
     {
       icon: <Calendar className="w-5 h-5" />,
       label: "Appointments",
       href: "/doctor-appointment",
-      mobileLabel: "Appointments"
+      mobileLabel: "Appointments",
     },
-    { 
-      icon: <User className="w-5 h-5" />, 
-      label: "Profile", 
+    {
+      icon: <User className="w-5 h-5" />,
+      label: "Profile",
       href: "/profile",
-      mobileLabel: "Profile"
+      mobileLabel: "Profile",
     },
     {
       icon: <Bell className="w-5 h-5" />,
       label: "Notifications",
       href: "/notifications",
-      mobileLabel: "Alerts"
+      mobileLabel: "Alerts",
     },
     {
       icon: <Settings className="w-5 h-5" />,
       label: "Settings",
       href: "/settings",
-      mobileLabel: "Settings"
+      mobileLabel: "Settings",
     },
   ];
 
@@ -153,21 +156,23 @@ const Layout = ({ children }) => {
     {
       icon: <LogIn className="w-5 h-5" />,
       label: "Login",
-      onClick: () => dispatch(openAuthModal({ mode: 'login' })),
-      mobileLabel: "Login"
+      onClick: () => dispatch(openAuthModal({ mode: "login" })),
+      mobileLabel: "Login",
     },
     {
       icon: <UserPlus className="w-5 h-5" />,
       label: "Register",
-       onClick: () => dispatch(openAuthModal({ mode: 'register' })),
-      mobileLabel: "Sign Up"
+      onClick: () => dispatch(openAuthModal({ mode: "register" })),
+      mobileLabel: "Sign Up",
     },
   ];
 
   // Mobile Bottom Navigation
   const MobileBottomNav = () => {
-    const bottomNavItems = isAuthenticated ? navItems.slice(0, 4) : authNavItems;
-    
+    const bottomNavItems = isAuthenticated
+      ? navItems.slice(0, 4)
+      : authNavItems;
+
     return (
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
         <div className="grid grid-cols-4 h-16">
@@ -176,9 +181,12 @@ const Layout = ({ children }) => {
               key={index}
               whileTap={{ scale: 0.95 }}
               className="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-blue-600"
-              onClick={item.onClick || (() => {
-                if (item.href) window.location.href = item.href;
-              })}
+              onClick={
+                item.onClick ||
+                (() => {
+                  if (item.href) window.location.href = item.href;
+                })
+              }
             >
               {item.icon}
               <span className="text-xs mt-1 truncate w-full text-center">
@@ -213,21 +221,20 @@ const Layout = ({ children }) => {
     const handleLogin = async () => {
       try {
         setError(null);
-        
+
         if (!formData.username || !formData.password) {
-          throw new Error('Please fill in all fields');
+          throw new Error("Please fill in all fields");
         }
-    
+
         await dispatch(
           login({
             username: formData.username.trim(),
             password: formData.password,
           })
         ).unwrap();
-        
+
         setIsLoginOpen(false);
         setFormData({ username: "", password: "" });
-        
       } catch (err) {
         const errorMessage = err.payload?.detail?.[0] || err.message;
         setError(errorMessage);
@@ -237,36 +244,38 @@ const Layout = ({ children }) => {
     const handleRegister = async () => {
       try {
         if (!formData.email || !formData.password || !formData.role) {
-          throw new Error('Please fill in all required fields');
+          throw new Error("Please fill in all required fields");
         }
-        
+
         await dispatch(register(formData)).unwrap();
         setIsRegisterOpen(false);
-        navigate('/check-email');
+        navigate("/check-email");
         setFormData({
           username: "",
           password: "",
           email: "",
         });
       } catch (err) {
-        setError(err.payload?.detail || 'Registration failed');
+        setError(err.payload?.detail || "Registration failed");
       }
     };
 
     return (
       <ThemeProvider theme={theme}>
-        <Dialog 
-          open={modalState.authModal.open && modalState.authModal.mode === 'login'}
+        <Dialog
+          open={
+            modalState.authModal.open && modalState.authModal.mode === "login"
+          }
           onClose={() => dispatch(closeAuthModal())}
           fullScreen={isMobile}
           maxWidth="sm"
           fullWidth
         >
-          <DialogTitle 
-            style={{ 
+          <DialogTitle
+            style={{
               color: "#1e40af",
-              textAlign: isMobile ? 'center' : 'left',
-              padding: isMobile ? '24px 16px 16px' : '24px'
+              textAlign: isMobile ? "center" : "left",
+              padding: isMobile ? "24px 16px 16px" : "24px",
             }}
           >
             {isMobile && (
@@ -279,7 +288,7 @@ const Layout = ({ children }) => {
             )}
             Login to MediCare Hub
           </DialogTitle>
-          <DialogContent style={{ padding: isMobile ? '0 16px' : '20px 24px' }}>
+          <DialogContent style={{ padding: isMobile ? "0 16px" : "20px 24px" }}>
             {error && (
               <Alert severity="error" className="mb-4">
                 {error}
@@ -307,9 +316,12 @@ const Layout = ({ children }) => {
               variant={isMobile ? "filled" : "outlined"}
             />
           </DialogContent>
-          <DialogActions style={{ padding: isMobile ? '16px' : '24px' }}>
+          <DialogActions style={{ padding: isMobile ? "16px" : "24px" }}>
             {!isMobile && (
-              <Button onClick={() => dispatch(closeAuthModal())} color="secondary">
+              <Button
+                onClick={() => dispatch(closeAuthModal())}
+                color="secondary"
+              >
                 Cancel
               </Button>
             )}
@@ -319,29 +331,32 @@ const Layout = ({ children }) => {
               disabled={loading}
               fullWidth={isMobile}
               size={isMobile ? "large" : "medium"}
-              style={{ 
-                backgroundColor: "#3b82f6", 
+              style={{
+                backgroundColor: "#3b82f6",
                 color: "white",
-                minHeight: isMobile ? "48px" : "auto"
+                minHeight: isMobile ? "48px" : "auto",
               }}
             >
               {loading ? "Logging in..." : "Login"}
             </Button>
           </DialogActions>
         </Dialog>
-        
-        <Dialog 
-          open={modalState.authModal.open && modalState.authModal.mode === 'register'}
+
+        <Dialog
+          open={
+            modalState.authModal.open &&
+            modalState.authModal.mode === "register"
+          }
           onClose={() => dispatch(closeAuthModal())}
           fullScreen={isMobile}
           maxWidth="sm"
           fullWidth
         >
-          <DialogTitle 
-            style={{ 
+          <DialogTitle
+            style={{
               color: "#1e40af",
-              textAlign: isMobile ? 'center' : 'left',
-              padding: isMobile ? '24px 16px 16px' : '24px'
+              textAlign: isMobile ? "center" : "left",
+              padding: isMobile ? "24px 16px 16px" : "24px",
             }}
           >
             {isMobile && (
@@ -354,7 +369,7 @@ const Layout = ({ children }) => {
             )}
             Create an Account
           </DialogTitle>
-          <DialogContent style={{ padding: isMobile ? '0 16px' : '20px 24px' }}>
+          <DialogContent style={{ padding: isMobile ? "0 16px" : "20px 24px" }}>
             {error && (
               <Alert severity="error" className="mb-4">
                 {error}
@@ -392,7 +407,12 @@ const Layout = ({ children }) => {
               InputLabelProps={{ style: { color: "#1e40af" } }}
               variant={isMobile ? "filled" : "outlined"}
             />
-            <FormControl fullWidth margin="normal" required variant={isMobile ? "filled" : "outlined"}>
+            <FormControl
+              fullWidth
+              margin="normal"
+              required
+              variant={isMobile ? "filled" : "outlined"}
+            >
               <InputLabel id="role-label" style={{ color: "#1e40af" }}>
                 Select Your Primary Role
               </InputLabel>
@@ -418,12 +438,16 @@ const Layout = ({ children }) => {
               </Select>
             </FormControl>
             <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-              Note: You can add additional roles later through your profile settings.
+              Note: You can add additional roles later through your profile
+              settings.
             </Typography>
           </DialogContent>
-          <DialogActions style={{ padding: isMobile ? '16px' : '24px' }}>
+          <DialogActions style={{ padding: isMobile ? "16px" : "24px" }}>
             {!isMobile && (
-              <Button onClick={() => dispatch(closeAuthModal())} color="secondary">
+              <Button
+                onClick={() => dispatch(closeAuthModal())}
+                color="secondary"
+              >
                 Cancel
               </Button>
             )}
@@ -433,10 +457,10 @@ const Layout = ({ children }) => {
               disabled={loading}
               fullWidth={isMobile}
               size={isMobile ? "large" : "medium"}
-              style={{ 
-                backgroundColor: "#3b82f6", 
+              style={{
+                backgroundColor: "#3b82f6",
                 color: "white",
-                minHeight: isMobile ? "48px" : "auto"
+                minHeight: isMobile ? "48px" : "auto",
               }}
             >
               {loading ? "Creating account..." : "Register"}
@@ -458,12 +482,12 @@ const Layout = ({ children }) => {
           >
             <Menu className="h-6 w-6" />
           </button>
-          
+
           <div className="flex items-center">
             <Hospital className="h-8 w-8 text-blue-600 mr-2" />
             <span className="font-semibold text-lg">MediCare Hub</span>
           </div>
-          
+
           <button
             onClick={() => setIsSearchOpen(!isSearchOpen)}
             className="p-2 -mr-2"
@@ -471,7 +495,7 @@ const Layout = ({ children }) => {
             <Search className="h-6 w-6" />
           </button>
         </div>
-        
+
         {/* Mobile Search */}
         <AnimatePresence>
           {isSearchOpen && (
@@ -503,7 +527,7 @@ const Layout = ({ children }) => {
             exit={{ x: -300 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className={`sidebar fixed left-0 top-0 h-screen bg-white shadow-lg z-40 ${
-              isMobile ? 'w-80' : 'w-20 md:w-64'
+              isMobile ? "w-80" : "w-20 md:w-64"
             }`}
           >
             <div className="flex flex-col h-full">
@@ -511,7 +535,11 @@ const Layout = ({ children }) => {
               <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
                 <a href="/" className="flex items-center">
                   <Hospital className="h-8 w-8 text-blue-600" />
-                  <span className={`font-semibold text-lg ml-2 ${isMobile ? 'block' : 'hidden md:block'}`}>
+                  <span
+                    className={`font-semibold text-lg ml-2 ${
+                      isMobile ? "block" : "hidden md:block"
+                    }`}
+                  >
                     MediCare Hub
                   </span>
                 </a>
@@ -527,44 +555,37 @@ const Layout = ({ children }) => {
 
               {/* Military Logos Section */}
               <div className="py-4 px-4 border-b border-gray-200">
-                <div className={`flex items-center ${isMobile ? 'justify-start space-x-4' : 'justify-center md:justify-between space-x-2 md:space-x-4'}`}>
+                <div
+                  className={`flex items-center ${
+                    isMobile
+                      ? "justify-start space-x-4"
+                      : "justify-center md:justify-between space-x-2 md:space-x-4"
+                  }`}
+                >
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-white border border-gray-200">
-                      <img 
-                        src="/airforce.png" 
-                        alt="Air Force Logo" 
+                      <img
+                        src="/airforce.png"
+                        alt="Air Force Logo"
                         className="w-full h-full object-contain"
                         onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
                         }}
                       />
-                      <div className="w-full h-full bg-blue-800 rounded-full flex items-center justify-center" style={{display: 'none'}}>
+                      <div
+                        className="w-full h-full bg-blue-800 rounded-full flex items-center justify-center"
+                        style={{ display: "none" }}
+                      >
                         <Plane className="w-5 h-5 text-white" />
                       </div>
                     </div>
-                    <span className={`text-xs font-medium text-gray-700 ${isMobile ? 'block' : 'hidden md:block'}`}>
+                    <span
+                      className={`text-xs font-medium text-gray-700 ${
+                        isMobile ? "block" : "hidden md:block"
+                      }`}
+                    >
                       Air Force
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-white">
-                      <img 
-                        src="/zim.png" 
-                        alt="Defense Forces Logo" 
-                        className="w-full h-full object-contain"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          e.target.nextSibling.style.display = 'flex';
-                        }}
-                      />
-                      <div className="w-full h-full bg-green-800 rounded-full flex items-center justify-center" style={{display: 'none'}}>
-                        <Shield className="w-5 h-5 text-white" />
-                      </div>
-                    </div>
-                    <span className={`text-xs font-medium text-gray-700 ${isMobile ? 'block' : 'hidden md:block'}`}>
-                      Defense Forces
                     </span>
                   </div>
                 </div>
@@ -579,13 +600,23 @@ const Layout = ({ children }) => {
                         whileHover={{ backgroundColor: "#F3F4F6" }}
                         whileTap={{ scale: 0.98 }}
                         className={`flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 ${
-                          isMobile ? 'min-h-[48px]' : ''
+                          isMobile ? "min-h-[48px]" : ""
                         }`}
                         onClick={() => setIsSidebarOpen(false)}
                       >
-                        <div className={`flex ${isMobile ? 'justify-start' : 'justify-center md:justify-start'} w-full`}>
+                        <div
+                          className={`flex ${
+                            isMobile
+                              ? "justify-start"
+                              : "justify-center md:justify-start"
+                          } w-full`}
+                        >
                           {item.icon}
-                          <span className={`ml-3 ${isMobile ? 'block' : 'hidden md:block'}`}>
+                          <span
+                            className={`ml-3 ${
+                              isMobile ? "block" : "hidden md:block"
+                            }`}
+                          >
                             {item.label}
                           </span>
                         </div>
@@ -597,13 +628,23 @@ const Layout = ({ children }) => {
                         whileHover={{ backgroundColor: "#F3F4F6" }}
                         whileTap={{ scale: 0.98 }}
                         className={`flex items-center w-full px-4 py-3 text-gray-700 hover:bg-gray-100 ${
-                          isMobile ? 'min-h-[48px]' : ''
+                          isMobile ? "min-h-[48px]" : ""
                         }`}
                         onClick={item.onClick}
                       >
-                        <div className={`flex ${isMobile ? 'justify-start' : 'justify-center md:justify-start'} w-full`}>
+                        <div
+                          className={`flex ${
+                            isMobile
+                              ? "justify-start"
+                              : "justify-center md:justify-start"
+                          } w-full`}
+                        >
                           {item.icon}
-                          <span className={`ml-3 ${isMobile ? 'block' : 'hidden md:block'}`}>
+                          <span
+                            className={`ml-3 ${
+                              isMobile ? "block" : "hidden md:block"
+                            }`}
+                          >
                             {item.label}
                           </span>
                         </div>
@@ -641,7 +682,7 @@ const Layout = ({ children }) => {
         />
       )}
 
-      <div className={`flex-1 ${!isMobile ? 'lg:ml-64' : ''}`}>
+      <div className={`flex-1 ${!isMobile ? "lg:ml-64" : ""}`}>
         {/* Desktop Top Navigation */}
         <nav className="hidden md:block bg-white shadow-sm sticky top-0 z-20">
           <div className="max-w-7xl mx-auto px-4">
@@ -651,13 +692,9 @@ const Layout = ({ children }) => {
                   <div className="w-6 h-6 bg-blue-800 rounded-full flex items-center justify-center">
                     <Plane className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">Air Force Medical</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-green-800 rounded-full flex items-center justify-center">
-                    <Shield className="w-4 h-4 text-white" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Defense Health Services</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Air Force Medical
+                  </span>
                 </div>
               </div>
 
@@ -685,7 +722,9 @@ const Layout = ({ children }) => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => dispatch(openAuthModal({ mode: 'register' }))}
+                    onClick={() =>
+                      dispatch(openAuthModal({ mode: "register" }))
+                    }
                     className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     <UserPlus className="w-5 h-5 mr-2" />
@@ -698,20 +737,21 @@ const Layout = ({ children }) => {
         </nav>
 
         {/* Main Content */}
-        <main className={`${isMobile ? 'pt-16 pb-20' : ''}`}>
+        <main className={`${isMobile ? "pt-16 pb-20" : ""}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {children}
           </div>
         </main>
-        
+
         {/* Footer */}
-        <footer className={`bg-white shadow-inner ${isMobile ? 'pb-20' : ''}`}>
+        <footer className={`bg-white shadow-inner ${isMobile ? "pb-20" : ""}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               <div>
                 <h3 className="text-lg font-semibold mb-4">MediCare Hub</h3>
                 <p className="text-gray-600 text-sm">
-                  Providing quality healthcare services for military personnel and defense forces.
+                  Providing quality healthcare services for military personnel
+                  and defense forces.
                 </p>
               </div>
               <div>
@@ -720,10 +760,6 @@ const Layout = ({ children }) => {
                   <li className="flex items-center">
                     <Plane className="w-4 h-4 mr-2 text-blue-800" />
                     Air Force Medical
-                  </li>
-                  <li className="flex items-center">
-                    <Shield className="w-4 h-4 mr-2 text-green-800" />
-                    Defense Health Services
                   </li>
                 </ul>
               </div>
@@ -759,7 +795,10 @@ const Layout = ({ children }) => {
               </div>
             </div>
             <div className="mt-8 pt-8 border-t text-center text-gray-600 text-sm">
-              <p>&copy; 2025 MediCare Hub - Defense Health Services. All rights reserved.</p>
+              <p>
+                &copy; 2025 MediCare Hub - Defense Health Services. All rights
+                reserved.
+              </p>
             </div>
           </div>
         </footer>
