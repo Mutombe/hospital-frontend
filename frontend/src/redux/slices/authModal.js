@@ -4,8 +4,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   authModal: {
     open: false,
-    mode: 'login', // 'login' or 'register'
-    redirectPath: '/', // Path to redirect after successful auth
+    mode: 'login', 
+    redirectPath: '/',
   },
 };
 

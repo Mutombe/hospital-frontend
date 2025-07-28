@@ -20,6 +20,7 @@ import {
   Home,
   ChevronDown,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import {
   Dialog,
@@ -66,6 +67,7 @@ const Layout = ({ children }) => {
   const [error, setError] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
@@ -99,14 +101,23 @@ const Layout = ({ children }) => {
 
   const handleLogout = async () => {
     try {
+      setLogoutLoading(true);
       await dispatch(logout()).unwrap();
       setIsSidebarOpen(false);
       window.location.reload();
     } catch (err) {
       console.error("Logout failed:", err);
+    } finally {
+      setLogoutLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (auth.isAuthenticated && modalState.authModal.redirectPath) {
+      navigate(modalState.authModal.redirectPath);
+      dispatch(closeAuthModal());
+    }
+  }, [auth.isAuthenticated, modalState, navigate, dispatch]);
   const navItems = [
     {
       icon: <Home className="w-5 h-5" />,
@@ -170,7 +181,20 @@ const Layout = ({ children }) => {
   // Mobile Bottom Navigation
   const MobileBottomNav = () => {
     const bottomNavItems = isAuthenticated
-      ? navItems.slice(0, 4)
+      ? [
+          ...navItems.slice(0, 3),
+          {
+            icon: logoutLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <LogOut className="w-5 h-5" />
+            ),
+            label: "Logout",
+            onClick: handleLogout,
+            mobileLabel: logoutLoading ? "Logging out..." : "Logout",
+            disabled: logoutLoading,
+          },
+        ]
       : authNavItems;
 
     return (
@@ -180,13 +204,13 @@ const Layout = ({ children }) => {
             <motion.button
               key={index}
               whileTap={{ scale: 0.95 }}
-              className="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-blue-600"
-              onClick={
-                item.onClick ||
-                (() => {
-                  if (item.href) window.location.href = item.href;
-                })
-              }
+              className={`flex flex-col items-center justify-center p-2 ${
+                item.disabled
+                  ? "text-gray-400 cursor-not-allowed"
+                  : "text-gray-600 hover:text-blue-600"
+              }`}
+              onClick={item.disabled ? undefined : item.onClick}
+              disabled={item.disabled}
             >
               {item.icon}
               <span className="text-xs mt-1 truncate w-full text-center">
@@ -658,11 +682,19 @@ const Layout = ({ children }) => {
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg"
-                    disabled={loading}
+                    disabled={logoutLoading}
+                    className={`flex items-center w-full px-4 py-3 ${
+                      logoutLoading
+                        ? "text-gray-500"
+                        : "text-red-600 hover:bg-red-50"
+                    } rounded-lg`}
                   >
-                    <LogOut className="w-5 h-5 mr-3" />
-                    {loading ? "Logging out..." : "Logout"}
+                    {logoutLoading ? (
+                      <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                    ) : (
+                      <LogOut className="w-5 h-5 mr-3" />
+                    )}
+                    {logoutLoading ? "Logging out..." : "Logout"}
                   </motion.button>
                 </div>
               )}
@@ -712,11 +744,19 @@ const Layout = ({ children }) => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleLogout}
-                    className="flex items-center px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50"
-                    disabled={loading}
+                    disabled={logoutLoading}
+                    className={`flex items-center px-4 py-2 bg-white ${
+                      logoutLoading
+                        ? "text-gray-500 border-gray-300"
+                        : "text-blue-600 border-blue-600 hover:bg-blue-50"
+                    } border rounded-lg`}
                   >
-                    <LogOut className="w-5 h-5 mr-2" />
-                    {loading ? "Logging out..." : "Logout"}
+                    {logoutLoading ? (
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    ) : (
+                      <LogOut className="w-5 h-5 mr-2" />
+                    )}
+                    {logoutLoading ? "Logging out..." : "Logout"}
                   </motion.button>
                 ) : (
                   <motion.button

@@ -13,7 +13,6 @@ import { VerifyEmailHandler } from "./components/auth/verify_email";
 import DoctorAppointmentBooking from "./components/dashboard/appointment";
 import PatientDashboard from "./components/dashboard/patientDashboard";
 import DoctorDashboard from "./components/dashboard/doctorsDashboard";
-import RequireAuth from "./utils/requireAuth";
 import ProfilePage from "./components/auth/profile";
 import About from "./components/about/about";
 
@@ -41,23 +40,9 @@ function App() {
               path="/verify-email/:uidb64/:token"
               element={<VerifyEmailHandler />}
             />
-            <Route
-              path="/profile"
-              element={
-                <RequireAuth>
-                  <ProfilePage />
-                </RequireAuth>
-              }
-            />
+            <Route path="/profile" element={<ProfilePage />} />
 
-            <Route
-              path="/patient-dashboard"
-              element={
-                <RequireAuth requireCompleteProfile>
-                  <PatientDashboard />
-                </RequireAuth>
-              }
-            />
+            <Route path="/patient-dashboard" element={<PatientDashboard />} />
             <Route
               path="/doctor-appointment"
               element={<DoctorAppointmentBooking />}
