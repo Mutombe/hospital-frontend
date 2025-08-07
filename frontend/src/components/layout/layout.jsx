@@ -112,12 +112,14 @@ const Layout = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    if (auth.isAuthenticated && modalState.authModal.redirectPath) {
-      navigate(modalState.authModal.redirectPath);
-      dispatch(closeAuthModal());
-    }
-  }, [auth.isAuthenticated, modalState, navigate, dispatch]);
+ // useEffect(() => {
+   // if (auth.isAuthenticated && modalState.authModal.redirectPath) {
+   //   navigate(modalState.authModal.redirectPath);
+    //  dispatch(closeAuthModal());
+   // }
+ // }, [auth.isAuthenticated, modalState, navigate, dispatch]);
+
+
   const navItems = [
     {
       icon: <Home className="w-5 h-5" />,
