@@ -33,7 +33,7 @@ const About = () => {
             >
               <Hospital className="w-16 h-16 mx-auto mb-6" />
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                About MediCare Hub
+                About Airforce of Zimbabwe HealthNet.
               </h1>
               <p className="text-xl md:text-2xl mb-8 opacity-90">
                 Serving those who serve our nation with dedicated healthcare
@@ -355,7 +355,7 @@ const About = () => {
               </h2>
               <p className="text-xl mb-8 opacity-90">
                 Whether you're active duty, a veteran, or a family member,
-                MediCare Hub is here to serve your healthcare needs.
+                Airforce of Zimbabwe HealthNet is here to serve your healthcare needs.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <motion.button

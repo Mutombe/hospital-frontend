@@ -112,13 +112,12 @@ const Layout = ({ children }) => {
     }
   };
 
- // useEffect(() => {
-   // if (auth.isAuthenticated && modalState.authModal.redirectPath) {
-   //   navigate(modalState.authModal.redirectPath);
-    //  dispatch(closeAuthModal());
-   // }
- // }, [auth.isAuthenticated, modalState, navigate, dispatch]);
-
+  // useEffect(() => {
+  // if (auth.isAuthenticated && modalState.authModal.redirectPath) {
+  //   navigate(modalState.authModal.redirectPath);
+  //  dispatch(closeAuthModal());
+  // }
+  // }, [auth.isAuthenticated, modalState, navigate, dispatch]);
 
   const navItems = [
     {
@@ -258,7 +257,7 @@ const Layout = ({ children }) => {
             password: formData.password,
           })
         ).unwrap();
-
+        dispatch(closeAuthModal());
         setIsLoginOpen(false);
         setFormData({ username: "", password: "" });
       } catch (err) {
@@ -275,6 +274,7 @@ const Layout = ({ children }) => {
 
         await dispatch(register(formData)).unwrap();
         setIsRegisterOpen(false);
+        dispatch(closeAuthModal());
         navigate("/check-email");
         setFormData({
           username: "",
@@ -282,7 +282,15 @@ const Layout = ({ children }) => {
           email: "",
         });
       } catch (err) {
-        setError(err.payload?.detail || "Registration failed");
+        // Display detailed server errors
+        if (err.payload?.errors) {
+          const errorMsg = Object.entries(err.payload.errors)
+            .map(([key, val]) => `${key}: ${val}`)
+            .join(", ");
+          setError(errorMsg);
+        } else {
+          setError(err.payload?.detail || "Registration failed");
+        }
       }
     };
 
@@ -312,7 +320,7 @@ const Layout = ({ children }) => {
                 <X className="w-5 h-5" />
               </button>
             )}
-            Login to MediCare Hub
+            Login to HealthNet
           </DialogTitle>
           <DialogContent style={{ padding: isMobile ? "0 16px" : "20px 24px" }}>
             {error && (
@@ -511,7 +519,9 @@ const Layout = ({ children }) => {
 
           <div className="flex items-center">
             <Hospital className="h-8 w-8 text-blue-600 mr-2" />
-            <span className="font-semibold text-lg">MediCare Hub</span>
+            <span className="font-semibold text-lg">
+              Airforce of Zimbabwe HealthNet.
+            </span>
           </div>
 
           <button
@@ -566,7 +576,7 @@ const Layout = ({ children }) => {
                       isMobile ? "block" : "hidden md:block"
                     }`}
                   >
-                    MediCare Hub
+                    HealthNet.
                   </span>
                 </a>
                 {isMobile && (
@@ -790,7 +800,9 @@ const Layout = ({ children }) => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               <div>
-                <h3 className="text-lg font-semibold mb-4">MediCare Hub</h3>
+                <h3 className="text-lg font-semibold mb-4">
+                  Airforce of Zimbabwe HealthNet
+                </h3>
                 <p className="text-gray-600 text-sm">
                   Providing quality healthcare services for military personnel
                   and defense forces.
@@ -838,8 +850,8 @@ const Layout = ({ children }) => {
             </div>
             <div className="mt-8 pt-8 border-t text-center text-gray-600 text-sm">
               <p>
-                &copy; 2025 MediCare Hub - Defense Health Services. All rights
-                reserved.
+                &copy; 2025 Airforce of Zimbabwe HealthNet - Defense Health
+                Services. All rights reserved.
               </p>
             </div>
           </div>

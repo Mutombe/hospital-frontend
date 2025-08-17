@@ -83,7 +83,7 @@ const AuthModals = () => {
     <ThemeProvider theme={theme}>
       {/* Login Dialog */}
       <Dialog open={isLoginOpen} onClose={() => setIsLoginOpen(false)}>
-        <DialogTitle style={{ color: '#1e40af' }}>Login to MediCare Hub</DialogTitle>
+        <DialogTitle style={{ color: '#1e40af' }}>Airforce of Zimbabwe HealthNet.</DialogTitle>
         <DialogContent>
           {error && <Alert severity="error" className="mb-4">{error}</Alert>}
           <TextField
@@ -306,7 +306,7 @@ const Layout = ({ children }) => {
             <div className="flex flex-col h-full">
               <div className="h-16 flex items-center justify-center md:justify-start px-4">
                 <span className="font-semibold text-lg hidden md:block ml-2">
-                  MediCare Hub
+                   HealthNet.
                 </span>
               </div>
               <div className="flex-1 py-6 space-y-1">

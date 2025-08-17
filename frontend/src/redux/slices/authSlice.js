@@ -32,14 +32,10 @@ export const register = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await api.post("register/", userData);
-      return {
-        email: userData.email,
-        detail: response.data?.detail || "Registration Successful",
-      };
+      return response.data;  // Return full response
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data || { detail: err.message || "Registration Failed" }
-      );
+      // Return complete error response
+      return rejectWithValue(err.response?.data); 
     }
   }
 );
