@@ -3,6 +3,29 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { createAction } from "@reduxjs/toolkit";
 import api from "../../utils/api";
 
+// Helper function to get stored auth data
+const getStoredAuthData = () => {
+  try {
+    const authData = JSON.parse(localStorage.getItem("auth"));
+    if (authData) {
+      return {
+        tokens: {
+          access: authData.access,
+          refresh: authData.refresh,
+        },
+        user: authData.user,
+      };
+    }
+    return { tokens: null, user: null };
+  } catch (error) {
+    console.error("Error parsing auth data from localStorage:", error);
+    return { tokens: null, user: null };
+  }
+};
+
+// Get initial state from localStorage
+const storedAuth = getStoredAuthData();
+
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
@@ -32,9 +55,8 @@ export const register = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await api.post("register/", userData);
-      return response.data;  // Return full response
+      return response.data;
     } catch (err) {
-      // Return complete error response
       return rejectWithValue(err.response?.data); 
     }
   }
@@ -55,9 +77,9 @@ export const resendVerificationEmail = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null,
-    tokens: JSON.parse(localStorage.getItem("auth")),
-    isAuthenticated: !!JSON.parse(localStorage.getItem("auth"))?.access,
+    user: storedAuth.user,
+    tokens: storedAuth.tokens,
+    isAuthenticated: !!storedAuth.tokens?.access,
     loading: false,
     status: "idle",
     error: null,
@@ -75,17 +97,20 @@ const authSlice = createSlice({
         ...state.user,
         ...action.payload,
       };
+      
+      // Update localStorage with new user data
+      const authData = JSON.parse(localStorage.getItem("auth")) || {};
+      authData.user = state.user;
+      localStorage.setItem("auth", JSON.stringify(authData));
     },
     updateProfileCompleteness: (state, action) => {
       if (state.user) {
         state.user.profile_complete = action.payload;
 
         // Update localStorage
-        const authData = JSON.parse(localStorage.getItem("auth"));
-        if (authData) {
-          authData.user.profile_complete = action.payload;
-          localStorage.setItem("auth", JSON.stringify(authData));
-        }
+        const authData = JSON.parse(localStorage.getItem("auth")) || {};
+        authData.user = state.user;
+        localStorage.setItem("auth", JSON.stringify(authData));
       }
     },
   },
@@ -144,8 +169,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
-export const { updateUser } = authSlice.actions;
+export const { logout, updateUser } = authSlice.actions;
 export const updateProfileCompleteness = createAction(
   "auth/updateProfileCompleteness"
 );

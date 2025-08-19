@@ -73,7 +73,7 @@ const Layout = ({ children }) => {
   const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const { isAuthenticated, loading } = useSelector((state) => state.auth);
+  const { isAuthenticated, loading, user } = useSelector((state) => state.auth);
   const modalState = useSelector((state) => state.modal);
 
   // Handle mobile detection
@@ -112,57 +112,70 @@ const Layout = ({ children }) => {
     }
   };
 
-  // useEffect(() => {
-  // if (auth.isAuthenticated && modalState.authModal.redirectPath) {
-  //   navigate(modalState.authModal.redirectPath);
-  //  dispatch(closeAuthModal());
-  // }
-  // }, [auth.isAuthenticated, modalState, navigate, dispatch]);
+  // Navigation items with role-based access control
+  const getNavItems = () => {
+    const baseNavItems = [
+      {
+        icon: <Home className="w-5 h-5" />,
+        label: "Dashboard",
+        href: "/",
+        mobileLabel: "Home",
+        roles: ['PATIENT', 'DOCTOR']
+      },
+      {
+        icon: <Hospital className="w-5 h-5" />,
+        label: "Patient Dashboard",
+        href: "/patient-dashboard",
+        mobileLabel: "Patient",
+        roles: ['PATIENT']
+      },
+      {
+        icon: <BriefcaseMedical className="w-5 h-5" />,
+        label: "Doctor's Dashboard",
+        href: "/doctor-dashboard",
+        mobileLabel: "Doctor",
+        roles: ['DOCTOR']
+      },
+      {
+        icon: <Calendar className="w-5 h-5" />,
+        label: "Appointments",
+        href: "/doctor-appointment",
+        mobileLabel: "Appointments",
+        roles: ['PATIENT', 'DOCTOR']
+      },
+      {
+        icon: <User className="w-5 h-5" />,
+        label: "Profile",
+        href: "/profile",
+        mobileLabel: "Profile",
+        roles: ['PATIENT', 'DOCTOR']
+      },
+      {
+        icon: <Bell className="w-5 h-5" />,
+        label: "Notifications",
+        href: "/",
+        mobileLabel: "Alerts",
+        roles: ['PATIENT', 'DOCTOR']
+      },
+      {
+        icon: <Settings className="w-5 h-5" />,
+        label: "Settings",
+        href: "/profile",
+        mobileLabel: "Settings",
+        roles: ['PATIENT', 'DOCTOR']
+      },
+    ];
 
-  const navItems = [
-    {
-      icon: <Home className="w-5 h-5" />,
-      label: "Dashboard",
-      href: "/",
-      mobileLabel: "Home",
-    },
-    {
-      icon: <Hospital className="w-5 h-5" />,
-      label: "Patient Dashboard",
-      href: "/patient-dashboard",
-      mobileLabel: "Patient",
-    },
-    {
-      icon: <BriefcaseMedical className="w-5 h-5" />,
-      label: "Doctor's Dashboard",
-      href: "/doctor-dashboard",
-      mobileLabel: "Doctor",
-    },
-    {
-      icon: <Calendar className="w-5 h-5" />,
-      label: "Appointments",
-      href: "/doctor-appointment",
-      mobileLabel: "Appointments",
-    },
-    {
-      icon: <User className="w-5 h-5" />,
-      label: "Profile",
-      href: "/profile",
-      mobileLabel: "Profile",
-    },
-    {
-      icon: <Bell className="w-5 h-5" />,
-      label: "Notifications",
-      href: "/notifications",
-      mobileLabel: "Alerts",
-    },
-    {
-      icon: <Settings className="w-5 h-5" />,
-      label: "Settings",
-      href: "/settings",
-      mobileLabel: "Settings",
-    },
-  ];
+    // If user is authenticated, filter based on role
+    if (isAuthenticated && user) {
+      return baseNavItems.filter(item => item.roles.includes(user.role));
+    }
+    
+    // If not authenticated, return empty array
+    return [];
+  };
+
+  const navItems = getNavItems();
 
   const authNavItems = [
     {

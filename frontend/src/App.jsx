@@ -16,6 +16,7 @@ import DoctorDashboard from "./components/dashboard/doctorsDashboard";
 import ProfilePage from "./components/auth/profile";
 import About from "./components/about/about";
 
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -27,6 +28,7 @@ const ScrollToTop = () => {
 };
 
 function App() {
+
   return (
     <>
       <Router>
