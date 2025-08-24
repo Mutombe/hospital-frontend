@@ -10,7 +10,8 @@ import Layout from "./components/layout/layout";
 import HomePage from "./components/home/home";
 import { CheckEmailPage } from "./components/auth/verify_email";
 import { VerifyEmailHandler } from "./components/auth/verify_email";
-import DoctorAppointmentBooking from "./components/dashboard/appointment";
+import AppointmentBooking from "./components/dashboard/appointmentBooking";
+import DoctorAppointmentManagement from "./components/dashboard/doctorsAppointmentManagement";
 import PatientDashboard from "./components/dashboard/patientDashboard";
 import DoctorDashboard from "./components/dashboard/doctorsDashboard";
 import ProfilePage from "./components/auth/profile";
@@ -47,7 +48,11 @@ function App() {
             <Route path="/patient-dashboard" element={<PatientDashboard />} />
             <Route
               path="/doctor-appointment"
-              element={<DoctorAppointmentBooking />}
+              element={<DoctorAppointmentManagement />}
+            />
+            <Route
+              path="/book-appointment"
+              element={<AppointmentBooking />}
             />
             <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
             {/* <Route path="/admin" element={<AdminPage />} /> */}

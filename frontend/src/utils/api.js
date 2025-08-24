@@ -1,26 +1,6 @@
 import axios from "axios";
 
 // Centralized token refresh function
-export const refreshTokens = async (refresh) => {
-  try {
-    const { data } = await axios.post(
-      "http://127.0.0.1:8000/core/auth/refresh/", 
-      { refresh },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
-    );
-    return {
-      access: data.access,
-      refresh: data.refresh || refresh 
-    };
-  } catch (error) {
-    console.error("Token Refresh Error:", error);
-    throw error;
-  }
-};
 
 const api = axios.create({
   baseURL:  'https://hospital-pf5g.onrender.com/api',

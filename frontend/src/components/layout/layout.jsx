@@ -141,7 +141,14 @@ const Layout = ({ children }) => {
         label: "Appointments",
         href: "/doctor-appointment",
         mobileLabel: "Appointments",
-        roles: ['PATIENT', 'DOCTOR']
+        roles: ['DOCTOR']
+      },
+            {
+        icon: <Calendar className="w-5 h-5" />,
+        label: "Book Appointments",
+        href: "/book-appointment",
+        mobileLabel: "Appointments",
+        roles: ['PATIENT']
       },
       {
         icon: <User className="w-5 h-5" />,
