@@ -34,6 +34,7 @@ const PatientDashboard = () => {
     loading,
     error 
   } = useSelector((state) => state.patient);
+  console.log("Appointments:", appointments);
   const { vitalHistory, loading: vitalSignsLoading, error: vitalSignsError } = useSelector((state) => state.vitalSigns);
   const { diagnoses, loading: diagnosesLoading, error: diagnosesError } = useSelector((state) => state.diagnosis);
   const { medications, loading: medicationsLoading, error: medicationsError } = useSelector((state) => state.medication);

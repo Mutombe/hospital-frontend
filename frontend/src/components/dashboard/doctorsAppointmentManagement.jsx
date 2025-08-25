@@ -2,8 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAppointments } from '../../redux/slices/patientSlice';
+import { fetchDoctorAppointments } from '../../redux/slices/doctorSlice';
 import { handleAppointment } from '../../redux/slices/doctorSlice';
 import { Calendar, Clock, User, CheckCircle, XCircle, MessageSquare } from 'lucide-react';
+
 
 const DoctorAppointmentManagement = () => {
   const dispatch = useDispatch();
@@ -15,6 +17,10 @@ const DoctorAppointmentManagement = () => {
   useEffect(() => {
     dispatch(fetchAppointments());
   }, [dispatch]);
+
+  useEffect(() => {
+  dispatch(fetchDoctorAppointments());
+}, [dispatch]);
 
   const filteredAppointments = appointments.filter(app => {
     if (filter === 'all') return true;
@@ -103,7 +109,7 @@ const DoctorAppointmentManagement = () => {
                     <User className="h-6 w-6 text-gray-600" />
                   </div>
                   <div>
-                    <h3 className="font-medium">{appointment.patient.user.first_name} {appointment.patient.user.last_name}</h3>
+                    <h3 className="font-medium">{appointment.patient.user.username}</h3>
                     <p className="text-sm text-gray-500">MRN: {appointment.patient.mrn}</p>
                     <div className="flex items-center mt-1 text-sm text-gray-600">
                       <Calendar className="h-4 w-4 mr-1" />

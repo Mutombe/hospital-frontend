@@ -13,13 +13,21 @@ import {
   RefreshCw,
   Search,
 } from "lucide-react";
-import { format, isToday, isThisWeek } from "date-fns";
+import {
+  format,
+  isToday,
+  isThisWeek,
+  isFuture,
+  startOfDay,
+  endOfWeek,
+} from "date-fns";
+import { fetchDoctorAppointments } from "../../redux/slices/doctorSlice";
+import { fetchPatients } from "../../redux/slices/patientSlice";
 
 const DoctorDashboard = () => {
   const dispatch = useDispatch();
-  const { appointments, patients, medicalRecords } = useSelector(
-    (state) => state.doctor
-  );
+  const { appointments } = useSelector((state) => state.doctor);
+  const { patients } = useSelector((state) => state.patient);
   const { user } = useSelector((state) => state.auth);
 
   const [filterStatus, setFilterStatus] = useState("all");
@@ -30,23 +38,95 @@ const DoctorDashboard = () => {
   // Simulated data fetch on component mount
   useEffect(() => {
     // In a real application, you would dispatch actions to fetch the data
-    // dispatch(fetchAppointments());
-    // dispatch(fetchPatients());
+    dispatch(fetchDoctorAppointments());
+    dispatch(fetchPatients());
     // dispatch(fetchMedicalRecords());
   }, [dispatch]);
 
   const todaysAppointments =
-    appointments?.filter((app) => isToday(new Date(app.appointment_date))) ||
-    [];
+    appointments?.filter((app) => {
+      const appointmentDate = new Date(app.appointment_date);
+      const today = new Date();
 
+      return (
+        appointmentDate.getFullYear() === today.getFullYear() &&
+        appointmentDate.getMonth() === today.getMonth() &&
+        appointmentDate.getDate() === today.getDate()
+      );
+    }) || [];
+
+  // Option 2: Use a wider range for upcoming appointments
   const upcomingAppointments =
-    appointments?.filter(
-      (app) =>
-        !isToday(new Date(app.appointment_date)) &&
-        isThisWeek(new Date(app.appointment_date)) &&
+    appointments?.filter((app) => {
+      const appointmentDate = new Date(app.appointment_date);
+      const today = startOfDay(new Date());
+      const weekEnd = endOfWeek(new Date());
+
+      return (
+        appointmentDate >= today && // Future appointments (including today)
+        appointmentDate <= weekEnd && // Within this week
+        !isToday(appointmentDate) && // Exclude today's appointments
         app.status !== "COMPLETED" &&
         app.status !== "CANCELLED"
-    ) || [];
+      );
+    }) || [];
+
+  // Option 3: Debug-friendly version with console logs
+  const todaysAppointmentsDebug =
+    appointments?.filter((app) => {
+      const appointmentDate = new Date(app.appointment_date);
+      const todayCheck = isToday(appointmentDate);
+
+      console.log("Checking appointment:", {
+        date: app.appointment_date,
+        appointmentDate,
+        isToday: todayCheck,
+        today: new Date(),
+      });
+
+      return todayCheck;
+    }) || [];
+
+  const upcomingAppointmentsDebug =
+    appointments?.filter((app) => {
+      const appointmentDate = new Date(app.appointment_date);
+      const todayCheck = isToday(appointmentDate);
+      const thisWeekCheck = isThisWeek(appointmentDate);
+      const futureCheck = isFuture(appointmentDate);
+
+      console.log("Checking upcoming appointment:", {
+        date: app.appointment_date,
+        appointmentDate,
+        isToday: todayCheck,
+        isThisWeek: thisWeekCheck,
+        isFuture: futureCheck,
+        status: app.status,
+      });
+
+      return (
+        !todayCheck &&
+        thisWeekCheck &&
+        app.status !== "COMPLETED" &&
+        app.status !== "CANCELLED"
+      );
+    }) || [];
+
+  // Option 4: Simple future appointments within 7 days
+  const next7DaysAppointments =
+    appointments?.filter((app) => {
+      const appointmentDate = new Date(app.appointment_date);
+      const today = new Date();
+      const nextWeek = new Date();
+      nextWeek.setDate(today.getDate() + 7);
+
+      return (
+        appointmentDate >= today &&
+        appointmentDate <= nextWeek &&
+        !isToday(appointmentDate) &&
+        app.status !== "COMPLETED" &&
+        app.status !== "CANCELLED"
+      );
+    }) || [];
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -437,7 +517,7 @@ const DoctorDashboard = () => {
             </div>
             <h2 className="text-xl font-semibold ml-3">Today's Schedule</h2>
           </div>
-          <div className="text-3xl font-bold">{todaysAppointments.length}</div>
+          <div className="text-3xl font-bold">{upcomingAppointments.length}</div>
           <div className="text-gray-500 mb-4">appointments scheduled</div>
           <div className="flex justify-between text-sm mb-2">
             <span>Status</span>
@@ -590,9 +670,9 @@ const DoctorDashboard = () => {
             </div>
           </div>
 
-          {todaysAppointments.length > 0 ? (
+          {upcomingAppointments.length > 0 ? (
             <div className="space-y-4">
-              {todaysAppointments
+              {upcomingAppointments
                 .filter(
                   (app) =>
                     filterStatus === "all" ||

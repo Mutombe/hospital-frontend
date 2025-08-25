@@ -1,44 +1,57 @@
 // features/doctors/doctorSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../utils/api';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../utils/api";
 
 export const fetchDoctors = createAsyncThunk(
-  'doctors/fetchDoctors',
+  "doctors/fetchDoctors",
   async () => {
-    const response = await api.get('/doctors/');
+    const response = await api.get("/doctors/");
+    return response.data;
+  }
+);
+
+export const fetchDoctorAppointments = createAsyncThunk(
+  "doctors/fetchAppointments",
+  async () => {
+    const response = await api.get("/appointments/");
     return response.data;
   }
 );
 
 export const updateSchedule = createAsyncThunk(
-  'doctors/updateSchedule',
+  "doctors/updateSchedule",
   async ({ doctorId, scheduleData }) => {
-    const response = await api.put(`/doctors/${doctorId}/schedule/`, scheduleData);
+    const response = await api.put(
+      `/doctors/${doctorId}/schedule/`,
+      scheduleData
+    );
     return response.data;
   }
 );
 
 export const handleAppointment = createAsyncThunk(
-  'doctors/handleAppointment',
+  "doctors/handleAppointment",
   async ({ appointmentId, status }) => {
-    const response = await api.patch(`/appointments/${appointmentId}/`, { status });
+    const response = await api.patch(`/appointments/${appointmentId}/`, {
+      status,
+    });
     return response.data;
   }
 );
 
 const doctorSlice = createSlice({
-  name: 'doctors',
+  name: "doctors",
   initialState: {
     doctors: [],
     schedules: [],
     appointments: [],
-    status: 'idle',
+    status: "idle",
     error: null,
   },
   reducers: {
     setAvailability: (state, action) => {
       const { doctorId, availability } = action.payload;
-      const doctor = state.doctors.find(d => d.id === doctorId);
+      const doctor = state.doctors.find((d) => d.id === doctorId);
       if (doctor) {
         doctor.availability = availability;
       }
@@ -50,14 +63,25 @@ const doctorSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchDoctors.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchDoctors.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.status = "succeeded";
         state.doctors = action.payload;
       })
       .addCase(fetchDoctors.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(fetchDoctorAppointments.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchDoctorAppointments.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.appointments = action.payload;
+      })
+      .addCase(fetchDoctorAppointments.rejected, (state, action) => {
+        state.status = "failed";
         state.error = action.error.message;
       });
   },

@@ -1,47 +1,45 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-// features/patients/patientSlice.js
-import api from '../../utils/api';
-import axios from 'axios';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../utils/api";
 
 export const fetchPatients = createAsyncThunk(
-  'patients/fetchPatients',
+  "patients/fetchPatients",
   async () => {
-    const response = await api.get('/patients/');
+    const response = await api.get("/patients/");
     return response.data;
   }
 );
 
 export const createMedicalRecord = createAsyncThunk(
-  'patients/createMedicalRecord',
+  "patients/createMedicalRecord",
   async (recordData) => {
-    const response = await api.post('/medical-records/', recordData);
+    const response = await api.post("/medical-records/", recordData);
     return response.data;
   }
 );
 
 export const bookAppointment = createAsyncThunk(
-  'patients/bookAppointment',
+  "patients/bookAppointment",
   async (appointmentData) => {
-    const response = await api.post('/appointments/', appointmentData);
+    const response = await api.post("/appointments/", appointmentData);
     return response.data;
   }
 );
 
 export const fetchAppointments = createAsyncThunk(
-  'patients/fetchAppointment',
+  "patients/fetchAppointments",
   async () => {
-    const response = await api.get('/appointments/');
+    const response = await api.get("/appointments/");
     return response.data;
   }
 );
 
 const patientSlice = createSlice({
-  name: 'patients',
+  name: "patients",
   initialState: {
     patients: [],
     medicalRecords: [],
     appointments: [],
-    status: 'idle',
+    status: "idle",
     error: null,
   },
   reducers: {
@@ -52,32 +50,33 @@ const patientSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchPatients.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchPatients.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.status = "succeeded";
         state.patients = action.payload;
       })
       .addCase(fetchPatients.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
         state.error = action.error.message;
       })
-    .addCase(createMedicalRecord.fulfilled, (state, action) => {
-      state.medicalRecords.push(action.payload);
-    })
-    .addCase(bookAppointment.fulfilled, (state, action) => {
-      state.appointments.push(action.payload);
-    })
-    .addCase(fetchAppointments.pending, (state) => {
-      state.status = 'loading';
-    })
-    .addCase(fetchAppointments.fulfilled, (state, action) => {
-      state.appointments.push(action.payload);
-    })
-    .addCase(fetchAppointments.rejected, (state, action) => {
-      state.status = 'failed';
-      state.error = action.error.message;
-    }); 
+      .addCase(createMedicalRecord.fulfilled, (state, action) => {
+        state.medicalRecords.push(action.payload);
+      })
+      .addCase(bookAppointment.fulfilled, (state, action) => {
+        state.appointments.push(action.payload);
+      })
+      .addCase(fetchAppointments.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchAppointments.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.appointments = action.payload;
+      })
+      .addCase(fetchAppointments.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      });
   },
 });
 

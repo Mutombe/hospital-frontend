@@ -1,13 +1,15 @@
-// components/appointments/AppointmentBooking.js - Simplified version
+// components/appointments/AppointmentBooking.js - Fixed version
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { bookAppointment } from '../../redux/slices/patientSlice';
 import { Calendar, Clock, User, Search } from 'lucide-react';
 import { fetchDoctors } from './../../redux/slices/doctorSlice';
+import api from '../../utils/api'; // Use your configured API instance
 
 const AppointmentBooking = () => {
   const dispatch = useDispatch();
   const { doctors, loading, error } = useSelector((state) => state.doctor);
+  const { user, isAuthenticated, tokens } = useSelector((state) => state.auth);
   
   // State variables
   const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -16,10 +18,25 @@ const AppointmentBooking = () => {
   const [reason, setReason] = useState('General Checkup');
   const [availableSlots, setAvailableSlots] = useState([]);
   const [step, setStep] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     dispatch(fetchDoctors());
   }, [dispatch]);
+
+  // Check if user is authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+        <div className="text-center">
+          <h2 className="text-lg font-medium text-gray-900">Please Login</h2>
+          <p className="mt-2 text-sm text-gray-500">
+            You need to be logged in to book an appointment.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleDoctorSelect = (doctor) => {
     setSelectedDoctor(doctor);
@@ -30,24 +47,21 @@ const AppointmentBooking = () => {
     if (!selectedDoctor) return;
     
     try {
-      const response = await fetch(`https://hospital-pf5g.onrender.com/api/doctors/${selectedDoctor.id}/availability/?date=${date}`);
-      const data = await response.json();
+      // Use your configured API instance instead of fetch
+      const response = await api.get(`/doctors/${selectedDoctor.id}/availability/?date=${date}`);
       
-      if (response.ok) {
-        setAvailableSlots(data.available_slots || []);
+      if (response.data.available_slots) {
+        setAvailableSlots(response.data.available_slots);
       } else {
-        // For demo, generate default time slots if API fails
         generateDefaultTimeSlots();
       }
     } catch (error) {
       console.error('Error fetching availability:', error);
-      // For demo, generate default time slots if API fails
       generateDefaultTimeSlots();
     }
   };
 
   const generateDefaultTimeSlots = () => {
-    // Generate time slots from 9 AM to 5 PM for demo
     const slots = [];
     for (let hour = 9; hour < 17; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
@@ -67,19 +81,38 @@ const AppointmentBooking = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedDoctor || !selectedDate || !selectedTime) return;
+    if (!selectedDoctor || !selectedDate || !selectedTime || submitting) return;
     
-    const appointmentData = {
-      doctor: selectedDoctor.id,
-      appointment_date: selectedDate,
-      appointment_time: selectedTime,
-      reason: reason
-    };
+    setSubmitting(true);
     
-    dispatch(bookAppointment(appointmentData));
-    setStep(3);
+    try {
+      const appointmentData = {
+        doctor: selectedDoctor.id,
+        appointment_date: selectedDate,
+        appointment_time: selectedTime,
+        reason: reason
+      };
+      
+      console.log('Sending appointment data:', appointmentData);
+      
+      // Use Redux action which will handle JWT authentication automatically
+      const result = await dispatch(bookAppointment(appointmentData));
+      
+      if (bookAppointment.fulfilled.match(result)) {
+        setStep(3);
+      } else {
+        // Handle error from Redux action
+        const errorMessage = result.payload?.error || result.error?.message || 'Failed to book appointment';
+        alert(errorMessage);
+      }
+    } catch (error) {
+      console.error('Error booking appointment:', error);
+      alert('Failed to book appointment. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (step === 3) {
@@ -94,7 +127,14 @@ const AppointmentBooking = () => {
             Your appointment with Dr. {selectedDoctor.user.username} on {selectedDate} at {selectedTime} has been booked.
           </p>
           <button
-            onClick={() => setStep(1)}
+            onClick={() => {
+              setStep(1);
+              setSelectedDoctor(null);
+              setSelectedDate('');
+              setSelectedTime('');
+              setReason('General Checkup');
+              setAvailableSlots([]);
+            }}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
             Book Another Appointment
@@ -119,7 +159,7 @@ const AppointmentBooking = () => {
             {doctors.map((doctor) => (
               <div
                 key={doctor.id}
-                className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
                 onClick={() => handleDoctorSelect(doctor)}
               >
                 <div className="flex items-center mb-2">
@@ -127,8 +167,8 @@ const AppointmentBooking = () => {
                     <User className="h-6 w-6 text-gray-600" />
                   </div>
                   <div className="ml-3">
-                    <p className="font-medium">Dr. {doctor.user.username} {doctor.user.last_name}</p>
-                    <p className="text-sm text-gray-500">{doctor.specialty?.name}</p>
+                    <p className="font-medium">Dr. {doctor.user.username}</p>
+                    <p className="text-sm text-gray-500">{doctor.specialty?.name || 'General Practice'}</p>
                   </div>
                 </div>
                 <p className="text-sm text-gray-600">{doctor.bio || 'No bio available'}</p>
@@ -151,7 +191,7 @@ const AppointmentBooking = () => {
               </svg>
             </button>
             <h3 className="text-lg font-medium">
-              Book with Dr. {selectedDoctor.user.first_name} {selectedDoctor.user.last_name}
+              Book with Dr. {selectedDoctor.user.username}
             </h3>
           </div>
           
@@ -179,7 +219,7 @@ const AppointmentBooking = () => {
                         key={slot}
                         type="button"
                         onClick={() => setSelectedTime(slot)}
-                        className={`py-2 px-3 rounded-md text-sm ${
+                        className={`py-2 px-3 rounded-md text-sm transition-colors ${
                           selectedTime === slot
                             ? 'bg-blue-600 text-white'
                             : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -211,10 +251,17 @@ const AppointmentBooking = () => {
             
             <button
               type="submit"
-              disabled={!selectedDate || !selectedTime}
-              className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!selectedDate || !selectedTime || submitting}
+              className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              Book Appointment
+              {submitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                  Booking...
+                </>
+              ) : (
+                'Book Appointment'
+              )}
             </button>
           </form>
         </div>
